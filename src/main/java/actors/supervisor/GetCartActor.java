@@ -5,7 +5,7 @@ import akka.actor.*;
 import akka.japi.pf.DeciderBuilder;
 import akka.routing.FromConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sun.media.sound.InvalidDataException;
+import java.lang.IllegalArgumentException;
 import com.typesafe.config.Config;
 import messages.GetCartListRequest;
 import messages.GetCartRequest;
@@ -38,7 +38,7 @@ public class GetCartActor extends AbstractActor {
                 .match(GetCartRequest.class, message -> {
                     cartCassandraActor.tell(message, getSender());
                 })
-                .match(InvalidDataException.class, message -> GeneralService.sendErrorJson(message))
+                .match(IllegalArgumentException.class, message -> GeneralService.sendErrorJson(message))
                 .match(JsonProcessingException.class, message -> GeneralService.sendErrorJson(message))
                 .match(Exception.class, message -> GeneralService.sendErrorJson(message)).build();
     }
