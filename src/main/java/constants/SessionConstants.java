@@ -15,8 +15,7 @@ public class SessionConstants {
     public static final String CLUSTER_USER ="persistence.cassandra.username";
     public static final String CLUSTER_PASSWORD ="persistence.cassandra.password";
 
-    public static final String DASHBOARD_CASSANDRA_SESSION = "OVODashboardCassandraSession";
-    public static final String DASHBOARD_KEYSPACE ="persistence.ovocassandra.keyspace";
+
     public static final String CASSANDRA_DB_HOST_NAME="persistence.cassandra.endpoints";
     public static final String CASSANDRA_DB_PORT ="persistence.cassandra.port";
     public static final String CASSANDRA_DB_KEYSPACE ="persistence.cassandra.keyspace";
