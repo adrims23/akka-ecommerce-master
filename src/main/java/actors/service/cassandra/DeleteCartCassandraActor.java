@@ -37,7 +37,7 @@ public class DeleteCartCassandraActor extends AbstractActor {
         }).build();
     }
 
-    private void deleteCart(String accountId, UUID cartId) {
+    private void deleteCart(String accountId, UUID cartId) throws JsonProcessingException {
         final Session session = SessionManager.getSession();
         log.info("inside deleteCart");
         PreparedStatement statement = session.prepare("DELETE FROM shoppingcart WHERE account_key = ? and  cart_id = ?");
@@ -55,7 +55,7 @@ public class DeleteCartCassandraActor extends AbstractActor {
         try {
             jsonInString=mapper.writeValueAsString(deletionResult);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+           throw e;
         }
 
         getSender().tell(jsonInString,ActorRef.noSender());

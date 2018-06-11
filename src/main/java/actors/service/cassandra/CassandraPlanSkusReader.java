@@ -2,7 +2,10 @@ package actors.service.cassandra;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import akka.actor.Props;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import messages.PlanSkuVo;
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.PreparedStatement;
@@ -20,7 +23,9 @@ import java.util.List;
 
 public class CassandraPlanSkusReader extends AbstractActor {
     private final Config appConfig;
+    ActorSystem system = context().system();
     SessionManager sessionManager = new SessionManager();
+    final LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
 
     public CassandraPlanSkusReader(Config appConfig) {
         this.appConfig = appConfig;
@@ -35,7 +40,7 @@ public class CassandraPlanSkusReader extends AbstractActor {
         }).build();
     }
 
-    private void getPlanSkus() throws NoDataAvailableException {
+    private void getPlanSkus() throws NoDataAvailableException, JsonProcessingException {
         // product_id | sku_id | prod_desc  | prod_enddate | prod_externalid | prod_frenchname
         // | prod_name | prod_startdate | sku_features| sku_order
 
@@ -43,13 +48,13 @@ public class CassandraPlanSkusReader extends AbstractActor {
         final Session session = sessionManager.getSession();
 
 
-        System.out.print("in GetPlanSkus");
         PreparedStatement statement = session.prepare("SELECT * FROM PLANSKU");
         BoundStatement boundStatement = statement.bind();
         ResultSet result = session.execute(boundStatement);
         //ResultSet result = session.execute(stmt.toString());
-        System.out.println(result);
+
         if (result != null) {
+            log.info("Populating results for getPlanSkus");
             result.forEach(row -> {
                 PlanSkuVo planSkuVo = new PlanSkuVo(row.getString("product_id"),
                         row.getString("sku_id"),
@@ -66,13 +71,12 @@ public class CassandraPlanSkusReader extends AbstractActor {
             try {
                 jsonInString = mapper.writeValueAsString(planList);
             } catch (JsonProcessingException e) {
-                getSender().tell("ExceptionOccured : "+e.getMessage(), ActorRef.noSender());
-                e.printStackTrace();
+               throw e;
             }
 
             getSender().tell(jsonInString, ActorRef.noSender());
         } else {
-            getSender().tell("There are no Plans available right now ", ActorRef.noSender());
+            log.info("No Planskus found");
             throw new NoDataAvailableException("There are no Plans available right now");
         }
 

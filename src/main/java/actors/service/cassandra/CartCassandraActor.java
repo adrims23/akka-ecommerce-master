@@ -9,7 +9,9 @@ import akka.event.LoggingAdapter;
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.utils.UUIDs;
 import com.google.common.reflect.TypeToken;
+import com.sun.media.sound.InvalidDataException;
 import com.typesafe.config.Config;
+import exception.NoDataAvailableException;
 import messages.*;
 
 import java.util.ArrayList;
@@ -50,6 +52,9 @@ public class CartCassandraActor extends AbstractActor {
         try {
 
             final Session session = SessionManager.getSession();
+            if(validate(cartRequest)){
+                throw new InvalidDataException("Mandatory fields Missing");
+            }
 
             PreparedStatement statement = session.prepare("INSERT INTO ecommerce.shoppingcart (account_key, cart_id, cart_status,create_ts,activitylist) VALUES (?,?,?,?,?)");
 
@@ -76,14 +81,24 @@ public class CartCassandraActor extends AbstractActor {
         }
     }
 
-    private void getCartDetails(GetCartRequest msg) {
+    private Boolean validate(CreateCartRequest cartRequest) {
+        if(cartRequest.getAccountKey()==null || cartRequest.getActivityMap()==null){
+            return false;
+        }
+        return true;
+    }
+
+    private void getCartDetails(GetCartRequest msg) throws NoDataAvailableException {
         final Session session = SessionManager.getSession();
         log.info("inside getDeviceList");
         PreparedStatement statement = session.prepare("SELECT * FROM SHOPPINGCART where account_key=? and cart_id=?");
         BoundStatement boundStatement = statement.bind(msg.getAccount_id(),msg.getCart_id());
         ResultSet result = session.execute(boundStatement);
         String message=null;
-
+        if(result==null){
+            //getSender().tell("There are no Plans available right now ", ActorRef.noSender());
+            throw new NoDataAvailableException("There are no cart for this account : "+msg.getAccount_id());
+        }
 //        GetCartResponse cartResponse=new GetCartResponse();
         Row cartDetails=result.one();
 
@@ -101,13 +116,18 @@ public class CartCassandraActor extends AbstractActor {
 
     }
 
-    private void getCartListDetails(GetCartListRequest msg) {
+    private void getCartListDetails(GetCartListRequest msg) throws NoDataAvailableException {
         final Session session = SessionManager.getSession();
         log.info("inside getDeviceList");
         PreparedStatement statement = session.prepare("SELECT * FROM SHOPPINGCART where account_key=?");
         BoundStatement boundStatement = statement.bind(msg.getAccount_id());
         ResultSet result = session.execute(boundStatement);
         String message=null;
+
+        if(result==null){
+            //getSender().tell("There are no Plans available right now ", ActorRef.noSender());
+            throw new NoDataAvailableException("There are no cart for this account : "+msg.getAccount_id());
+        }
 
 //        GetCartResponse cartResponse=new GetCartResponse();
         List<Row> cartDetails=result.all();

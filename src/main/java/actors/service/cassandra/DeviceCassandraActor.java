@@ -10,6 +10,7 @@ import com.datastax.driver.core.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
+import exception.NoDataAvailableException;
 import messages.FetchDeviceResponse;
 import messages.GetDeviceRequest;
 import messages.PostDeviceRequest;
@@ -27,16 +28,15 @@ public class DeviceCassandraActor extends AbstractActor {
         this.config = config;
     }
 
-    public static Props props(Config config)
-    {
-        return Props.create(DeviceCassandraActor.class,()->new DeviceCassandraActor(config));
+    public static Props props(Config config) {
+        return Props.create(DeviceCassandraActor.class, () -> new DeviceCassandraActor(config));
     }
 
     @Override
     public Receive createReceive() {
-        return receiveBuilder().match(GetDeviceRequest.class, msg ->{
+        return receiveBuilder().match(GetDeviceRequest.class, msg -> {
             getDeviceList();
-        }).match(PostDeviceRequest.class, msg ->{
+        }).match(PostDeviceRequest.class, msg -> {
             postDevice(msg);
         }).build();
     }
@@ -45,29 +45,32 @@ public class DeviceCassandraActor extends AbstractActor {
         final Session session = SessionManager.getSession();
         log.info("inside postDevice");
         PreparedStatement statement = session.prepare("INSERT INTO ecommerce.devicesku(product_id,sku_id,sku_order,prod_name,prod_frenchname,prod_desc,prod_externalid) values(?,?,?,?,?,?,?)");
-        BoundStatement boundStatement = statement.bind(message.getProduct_id(),message.getSku_id(),message.getSku_order(),message.getProd_name(),message.getProd_frenchName(),message.getProd_desc(),message.getProd_externalId());
+        BoundStatement boundStatement = statement.bind(message.getProduct_id(), message.getSku_id(), message.getSku_order(), message.getProd_name(), message.getProd_frenchName(), message.getProd_desc(), message.getProd_externalId());
         ResultSet result = session.execute(boundStatement);
-        Object msg=null;
+        Object msg = null;
         log.info("Device inserted");
 
-        getSender().tell("device inserted",ActorRef.noSender());
+        getSender().tell("device inserted", ActorRef.noSender());
 
 
     }
 
-    private void getDeviceList() {
+    private void getDeviceList() throws NoDataAvailableException, JsonProcessingException {
         final Session session = SessionManager.getSession();
         log.info("inside getDeviceList");
         PreparedStatement statement = session.prepare("SELECT * FROM DEVICESKU");
         BoundStatement boundStatement = statement.bind();
         ResultSet result = session.execute(boundStatement);
-        Object message=null;
+        Object message = null;
 
         log.info("before result set fetch");
-
-        List<Row> devices=result.all();
-        List<FetchDeviceResponse> deviceList=new ArrayList<>();
-        FetchDeviceResponse fetchDevice=new FetchDeviceResponse();
+        if (result == null) {
+            //getSender().tell("There are no Plans available right now ", ActorRef.noSender());
+            throw new NoDataAvailableException("There are no Devices available right now");
+        }
+        List<Row> devices = result.all();
+        List<FetchDeviceResponse> deviceList = new ArrayList<>();
+        FetchDeviceResponse fetchDevice = new FetchDeviceResponse();
         devices.forEach(device -> {
             fetchDevice.setProduct_id(device.getString("product_id"));
             fetchDevice.setSku_id(device.getString("sku_id"));
@@ -84,14 +87,14 @@ public class DeviceCassandraActor extends AbstractActor {
         });
 
         ObjectMapper mapper = new ObjectMapper();
-        String jsonInString=null;
+        String jsonInString = null;
         try {
-            jsonInString=mapper.writeValueAsString(deviceList);
+            jsonInString = mapper.writeValueAsString(deviceList);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+           throw e;
         }
 
-        getSender().tell(jsonInString,ActorRef.noSender());
+        getSender().tell(jsonInString, ActorRef.noSender());
 
     }
 }
