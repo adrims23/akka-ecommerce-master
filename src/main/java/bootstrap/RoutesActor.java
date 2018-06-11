@@ -17,7 +17,6 @@ import com.typesafe.config.Config;
 import constants.RogersConstants;
 import messages.*;
 
-import java.nio.file.PathMatcher;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
@@ -30,6 +29,7 @@ public class RoutesActor extends AbstractActor {
     private final ActorRef getCartSupervisorActor;
 //    private final ActorRef deviceCassandraActor;
     private final ActorRef deleteCartSupervisorActor;
+    private final ActorRef updateCartSupervisorActor;
     private final ActorRef createCartSupervisorActor;
     private final ActorRef getDeviceActor;
     private final ActorRef getPlanActor;
@@ -43,6 +43,7 @@ public class RoutesActor extends AbstractActor {
         this.objectMapper = new ObjectMapper();
         this.getCartSupervisorActor = system.actorOf(GetCartActor.props(appConfig), "GetCartActor");
         this.getPlanActor = system.actorOf(GetPlanActor.props(appConfig), "GetPlanActor");
+        this.updateCartSupervisorActor = system.actorOf(UpdateCartActor.props(appConfig), "UpdateCartActor");
         this.deleteCartSupervisorActor = system.actorOf(DeleteCartActor.props(appConfig), "DeleteCartActor");
         this.createCartSupervisorActor = system.actorOf(CreateCartActor.props(appConfig), "CreateCartActor");
 
@@ -94,6 +95,7 @@ public class RoutesActor extends AbstractActor {
                     fetchPlanSkus(),
                     deleteCartDetails(),
                     createCart(),
+                    updateCart(),
                     getStopPath(mainActor, host)
             );
         }
@@ -245,6 +247,31 @@ public class RoutesActor extends AbstractActor {
             );
 
         }
+
+        private Route updateCart() {
+            ///v1/commerce/{AccountID}/cart/{cartId}
+            final PathMatcher2 segment = PathMatchers.segment(appConfig.getString(RogersConstants.CARTMS_API_COMMERCE))
+                    .slash(PathMatchers.segment())
+                    .slash(appConfig.getString(RogersConstants.CARTMS_API_CART))
+                    .slash(PathMatchers.segment());
+            return route(
+                    put(()-> pathPrefix(appConfig.getString(RogersConstants.CARTMS_API_VERSION),
+                            ()-> path(segment, (accountId,cartId) -> entity(Jackson.unmarshaller(UpdateCartRequestBody.class),
+                                    requestObj -> {
+                                        final CompletionStage<Object> consolidatedDetailF =
+                                                PatternsCS.ask(updateCartSupervisorActor,new UpdateCartRequest(accountId
+                                                                .toString(),
+                                                                requestObj.getCartStatus(),
+                                                                UUID.fromString(cartId.toString()),
+                                                                requestObj.getActivitylist()),
+                                                        appConfig.getLong("actors.timeout"));
+                                        return onSuccess(()-> consolidatedDetailF,
+                                                cartDetails -> this.complete(StatusCodes.OK, cartDetails, Jackson.marshaller()));
+                                    })
+                            )))
+            );
+        }
+
 
         @Path("/stop")
         public Route getStopPath(ActorRef actorRef, String host) {
