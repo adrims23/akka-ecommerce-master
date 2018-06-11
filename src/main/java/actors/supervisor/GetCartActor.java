@@ -4,10 +4,13 @@ import actors.service.cassandra.CartCassandraActor;
 import akka.actor.*;
 import akka.japi.pf.DeciderBuilder;
 import akka.routing.FromConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sun.media.sound.InvalidDataException;
 import com.typesafe.config.Config;
 import messages.GetCartListRequest;
 import messages.GetCartRequest;
 import scala.concurrent.duration.Duration;
+import util.GeneralService;
 
 import java.io.IOException;
 
@@ -18,7 +21,7 @@ public class GetCartActor extends AbstractActor {
     public GetCartActor(Config config) {
         this.config = config;
         this.cartCassandraActor = getContext().actorOf(FromConfig.getInstance().
-                        props(CartCassandraActor.props(config)), "cartCassandraActor");
+                props(CartCassandraActor.props(config)), "cartCassandraActor");
     }
 
     public static Props props(Config config) {
@@ -29,11 +32,15 @@ public class GetCartActor extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(GetCartListRequest.class, message ->{
+                .match(GetCartListRequest.class, message -> {
                     cartCassandraActor.tell(message, getSender());
-                }).match(GetCartRequest.class, message ->{
-                    cartCassandraActor.tell(message,getSender());
-                }).build();
+                })
+                .match(GetCartRequest.class, message -> {
+                    cartCassandraActor.tell(message, getSender());
+                })
+                .match(InvalidDataException.class, message -> GeneralService.sendErrorJson(message))
+                .match(JsonProcessingException.class, message -> GeneralService.sendErrorJson(message))
+                .match(Exception.class, message -> GeneralService.sendErrorJson(message)).build();
     }
 
     @Override

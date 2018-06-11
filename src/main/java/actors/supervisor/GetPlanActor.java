@@ -4,11 +4,13 @@ import actors.service.cassandra.CassandraPlanSkusReader;
 import akka.actor.*;
 import akka.japi.pf.DeciderBuilder;
 import akka.routing.FromConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.typesafe.config.Config;
 import exception.NoDataAvailableException;
 import jdk.nashorn.internal.parser.JSONParser;
 import messages.GetPlanRequest;
 import scala.concurrent.duration.Duration;
+import util.GeneralService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,23 +33,15 @@ public class GetPlanActor extends AbstractActor {
     public Receive createReceive() {
 
         return receiveBuilder()
-                .match(GetPlanRequest.class, message -> {
-                    cassandraPlanReaderActor.tell(message, getSender());
-                })
-                .match(NoDataAvailableException.class, e -> {
-                    sendExceptionJson(e);
-                })
+                .match(GetPlanRequest.class, message -> {cassandraPlanReaderActor.tell(message, getSender());})
+                .match(NoDataAvailableException.class, e -> GeneralService.sendErrorJson(e))
+                .match(JsonProcessingException.class, message-> GeneralService.sendErrorJson(message))
                 .matchAny(s->{getSender().tell("requestNotExpected",ActorRef.noSender());})
                 .build();
 
     }
 
-    private String sendExceptionJson(NoDataAvailableException e) {
-        Map<String, String> exceptonMap = new HashMap<>();
-        exceptonMap.put("Message", e.message);
 
-        return JSONParser.quote(exceptonMap.toString());
-    }
 
     private static SupervisorStrategy strategy =
             new OneForOneStrategy(10, Duration.create("1 minute"), DeciderBuilder.

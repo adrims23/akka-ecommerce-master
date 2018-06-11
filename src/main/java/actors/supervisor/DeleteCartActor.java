@@ -5,10 +5,12 @@ import actors.service.cassandra.DeleteCartCassandraActor;
 import akka.actor.*;
 import akka.japi.pf.DeciderBuilder;
 import akka.routing.FromConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.typesafe.config.Config;
 import messages.DeleteCartRequest;
 import messages.GetCartRequest;
 import scala.concurrent.duration.Duration;
+import util.GeneralService;
 
 import java.io.IOException;
 
@@ -19,7 +21,7 @@ public class DeleteCartActor extends AbstractActor {
     public DeleteCartActor(Config config) {
         this.config = config;
         this.deleteCartCassandraActor = getContext().actorOf(FromConfig.getInstance().
-                        props(DeleteCartCassandraActor.props(config)), "deleteCartCassandraActor");
+                props(DeleteCartCassandraActor.props(config)), "deleteCartCassandraActor");
     }
 
     public static Props props(Config config) {
@@ -30,9 +32,10 @@ public class DeleteCartActor extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(DeleteCartRequest.class, message ->{
-                    deleteCartCassandraActor.tell(message, getSender());
-                }).build();
+                .match(DeleteCartRequest.class, message -> {
+                    deleteCartCassandraActor.tell(message, getSender());})
+                .match(JsonProcessingException.class,message-> GeneralService.sendErrorJson(message))
+                .build();
     }
 
     @Override

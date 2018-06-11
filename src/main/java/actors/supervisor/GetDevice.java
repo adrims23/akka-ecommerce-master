@@ -6,17 +6,18 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.routing.FromConfig;
 import com.typesafe.config.Config;
+import exception.NoDataAvailableException;
 import messages.GetDeviceRequest;
 import messages.PostDeviceRequest;
+import util.GeneralService;
 
 public class GetDevice extends AbstractActor {
 
     private final ActorRef deviceCassandraActor;
     private final Config config;
 
-    public static Props props(Config config)
-    {
-        return Props.create(GetDevice.class,()->new GetDevice(config));
+    public static Props props(Config config) {
+        return Props.create(GetDevice.class, () -> new GetDevice(config));
     }
 
 //    public GetDevice(ActorRef deviceCassandraActor) {
@@ -26,16 +27,18 @@ public class GetDevice extends AbstractActor {
 
     public GetDevice(Config config) {
         this.config = config;
-        this.deviceCassandraActor=getContext().actorOf(FromConfig.getInstance().props(DeviceCassandraActor.props(config)),"deviceCassandraActor");
+        this.deviceCassandraActor = getContext().actorOf(FromConfig.getInstance().props(DeviceCassandraActor.props(config)), "deviceCassandraActor");
     }
 
     @Override
     public Receive createReceive() {
-        return receiveBuilder().match(GetDeviceRequest.class, msg ->{
-//            Patterns.ask(deviceCassandraActor,"all",10000);
-            deviceCassandraActor.tell(msg,getSender());
-        }).match(PostDeviceRequest.class, msg ->{
-            deviceCassandraActor.tell(msg,getSender());
-        }).build();
+        return receiveBuilder().match(GetDeviceRequest.class, msg -> {
+            deviceCassandraActor.tell(msg, getSender());
+        }).match(PostDeviceRequest.class, msg -> {
+            deviceCassandraActor.tell(msg, getSender());
+        }).match(NoDataAvailableException.class, e -> {
+            GeneralService.sendErrorJson(e);
+        })
+                .build();
     }
 }
