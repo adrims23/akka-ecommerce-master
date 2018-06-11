@@ -43,6 +43,8 @@ public class CartCassandraActor extends AbstractActor {
             getCartDetails(msg);
         }).match(CreateCartRequest.class, msg ->{
             createAndPersisitCart(msg);
+        }).match(UpdateCartRequest.class, msg->{
+            updateCart(msg);
         }).build();
     }
 
@@ -132,5 +134,26 @@ public class CartCassandraActor extends AbstractActor {
         log.info("before result set fetch");
         getSender().tell(cartList,ActorRef.noSender());
 
+    }
+
+    private void updateCart(UpdateCartRequest message) {
+        final Session session = SessionManager.getSession();
+        log.info("inside updateCart method in Device Cassandra Actor");
+        PreparedStatement statement = session.prepare("UPDATE shoppingcart SET cart_status = ?, modify_ts=?, activitylist=? " +
+                "WHERE account_key= ? AND cart_id = ?");
+        BoundStatement boundStatement = statement.bind()
+                .setString("cart_status", message.getCartStatus())
+                .setTimestamp("modify_ts", new java.util.Date())
+                .set("activitylist", message.getActivitylist(), TYPE_TOKEN)
+                .setString("account_key", message.getAccountId())
+                .setUUID("cart_id", message.getCartId());
+
+
+
+//        BoundStatement boundStatement = statement.bind(message.getCartStatus(),message.getAccountId(),message.getCartId());
+        ResultSet resultSet = session.execute(boundStatement);
+        Object msg = null;
+        log.info("cart with account id "+ message.getAccountId() + "has been updated");
+        getSender().tell("cart Updated", ActorRef.noSender());
     }
 }
