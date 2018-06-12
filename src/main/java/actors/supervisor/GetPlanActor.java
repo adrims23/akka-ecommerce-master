@@ -33,19 +33,26 @@ public class GetPlanActor extends AbstractActor {
     public Receive createReceive() {
 
         return receiveBuilder()
-                .match(GetPlanRequest.class, message -> {cassandraPlanReaderActor.tell(message, getSender());})
-                .match(NoDataAvailableException.class, e -> GeneralService.sendErrorJson(e))
-                .match(JsonProcessingException.class, message-> GeneralService.sendErrorJson(message))
-                .matchAny(s->{getSender().tell("requestNotExpected",ActorRef.noSender());})
+                .match(GetPlanRequest.class, message -> {
+                    cassandraPlanReaderActor.tell(message, getSender());
+                })
+                .match(NoDataAvailableException.class, e -> {
+                    getSender().tell(GeneralService.sendErrorJson(e), getSelf());
+                })
+                .match(JsonProcessingException.class, e -> {
+                    getSender().tell(GeneralService.sendErrorJson(e), getSelf());
+                })
+                .matchAny(s -> {
+                    getSender().tell("requestNotExpected", ActorRef.noSender());
+                })
                 .build();
 
     }
 
 
-
     private static SupervisorStrategy strategy =
             new OneForOneStrategy(10, Duration.create("1 minute"), DeciderBuilder.
-                    match(NoDataAvailableException.class, e -> SupervisorStrategy.stop()).
+                    match(NoDataAvailableException.class, e -> SupervisorStrategy.resume()).
                     match(NullPointerException.class, n -> SupervisorStrategy.restart()).
                     match(IllegalArgumentException.class, i -> SupervisorStrategy.stop()).
                     matchAny(o -> SupervisorStrategy.stop()).build());

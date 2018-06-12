@@ -7,6 +7,7 @@ import akka.routing.FromConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.lang.IllegalArgumentException;
 import com.typesafe.config.Config;
+import exception.NoDataAvailableException;
 import messages.GetCartListRequest;
 import messages.GetCartRequest;
 import scala.concurrent.duration.Duration;
@@ -38,9 +39,11 @@ public class GetCartActor extends AbstractActor {
                 .match(GetCartRequest.class, message -> {
                     cartCassandraActor.tell(message, getSender());
                 })
-                .match(IllegalArgumentException.class, message -> GeneralService.sendErrorJson(message))
-                .match(JsonProcessingException.class, message -> GeneralService.sendErrorJson(message))
-                .match(Exception.class, message -> GeneralService.sendErrorJson(message)).build();
+
+                .match(NoDataAvailableException.class, message -> getSender().tell(GeneralService.sendErrorJson(message),getSelf()))
+                .match(JsonProcessingException.class, message -> getSender().tell(GeneralService.sendErrorJson(message),getSelf()))
+                .match(Exception.class, message -> getSender().tell(GeneralService.sendErrorJson(message),getSelf())).build();
+
     }
 
     @Override

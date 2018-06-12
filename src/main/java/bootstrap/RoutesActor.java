@@ -15,7 +15,9 @@ import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import com.typesafe.config.Config;
 import constants.RogersConstants;
+import exception.NoDataAvailableException;
 import messages.*;
+import util.GeneralService;
 
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
@@ -154,6 +156,7 @@ public class RoutesActor extends AbstractActor {
                                                 appConfig.getLong("actors.timeout"));
                                 return onSuccess(() -> consolidatedDetailF,
                                         cartDetails -> this.complete(StatusCodes.OK, cartDetails, Jackson.marshaller()));
+                                //return handleExceptions(msg->{GeneralService.sendErrorJson(new NoDataAvailableException());});
                             })
                             )
                     ))
