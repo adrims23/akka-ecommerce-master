@@ -54,7 +54,7 @@ public class CartCassandraActor extends AbstractActor {
         try {
 
             final Session session = SessionManager.getSession();
-            if(validate(cartRequest)){
+            if(!validate(cartRequest)){
                 throw new InvalidDataException("Mandatory fields Missing");
             }
 

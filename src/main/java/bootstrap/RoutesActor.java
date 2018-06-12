@@ -236,7 +236,7 @@ public class RoutesActor extends AbstractActor {
                     post(() -> pathPrefix(appConfig.getString(RogersConstants.CARTMS_API_VERSION),
                             () -> path(segment, (accountID) ->entity(Jackson.unmarshaller(CreateCartRequest.class), message -> {
                                         final CompletionStage<Object> consolidatedDetailF =
-                                                PatternsCS.ask(createCartSupervisorActor, message,
+                                                PatternsCS.ask(createCartSupervisorActor, new CreateCartRequest(accountID.toString(),message.getCartStatus(),message.getActivityMap()),
                                                         appConfig.getLong("actors.timeout"));
                                         return onSuccess(() -> consolidatedDetailF,
                                                 cartDetails -> this.complete(StatusCodes.OK, cartDetails, Jackson.marshaller()));
