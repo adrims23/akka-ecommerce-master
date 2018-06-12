@@ -44,7 +44,7 @@ public class CassandraPlanSkusReader extends AbstractActor {
         // product_id | sku_id | prod_desc  | prod_enddate | prod_externalid | prod_frenchname
         // | prod_name | prod_startdate | sku_features| sku_order
 
-        List<PlanSkuVo> planList = new ArrayList();
+        List<PlanSkuVo> planList = new ArrayList<>();
         final Session session = sessionManager.getSession();
 
 

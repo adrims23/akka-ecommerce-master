@@ -1,14 +1,14 @@
 package actors.supervisor;
 
 import actors.service.cassandra.DeviceCassandraActor;
-import akka.actor.AbstractActor;
-import akka.actor.ActorRef;
-import akka.actor.Props;
+import akka.actor.*;
+import akka.japi.pf.DeciderBuilder;
 import akka.routing.FromConfig;
 import com.typesafe.config.Config;
 import exception.NoDataAvailableException;
 import messages.GetDeviceRequest;
 import messages.PostDeviceRequest;
+import scala.concurrent.duration.Duration;
 import util.GeneralService;
 
 public class GetDevice extends AbstractActor {
@@ -37,8 +37,15 @@ public class GetDevice extends AbstractActor {
         }).match(PostDeviceRequest.class, msg -> {
             deviceCassandraActor.tell(msg, getSender());
         }).match(NoDataAvailableException.class, e -> {
-            GeneralService.sendErrorJson(e);
+            getSender().tell(GeneralService.sendErrorJson(e),getSelf());
         })
                 .build();
     }
+
+    private static SupervisorStrategy strategy =
+            new OneForOneStrategy(10, Duration.create("1 minute"), DeciderBuilder.
+                    match(NoDataAvailableException.class, e -> SupervisorStrategy.resume()).
+                    match(NullPointerException.class, n -> SupervisorStrategy.restart()).
+                    match(IllegalArgumentException.class, i -> SupervisorStrategy.stop()).
+                    matchAny(o -> SupervisorStrategy.stop()).build());
 }

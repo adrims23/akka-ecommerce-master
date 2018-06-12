@@ -34,7 +34,7 @@ public class DeleteCartActor extends AbstractActor {
         return receiveBuilder()
                 .match(DeleteCartRequest.class, message -> {
                     deleteCartCassandraActor.tell(message, getSender());})
-                .match(JsonProcessingException.class,message-> GeneralService.sendErrorJson(message))
+                .match(JsonProcessingException.class,message-> getSender().tell(GeneralService.sendErrorJson(message),getSelf()))
                 .build();
     }
 

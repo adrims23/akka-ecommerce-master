@@ -9,7 +9,7 @@ import akka.event.LoggingAdapter;
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.utils.UUIDs;
 import com.google.common.reflect.TypeToken;
-import com.sun.media.sound.InvalidDataException;
+import java.lang.IllegalArgumentException;
 import com.typesafe.config.Config;
 import exception.NoDataAvailableException;
 import messages.*;
@@ -55,7 +55,7 @@ public class CartCassandraActor extends AbstractActor {
 
             final Session session = SessionManager.getSession();
             if(!validate(cartRequest)){
-                throw new InvalidDataException("Mandatory fields Missing");
+                throw new IllegalArgumentException("Mandatory fields Missing");
             }
 
             PreparedStatement statement = session.prepare("INSERT INTO ecommerce.shoppingcart (account_key, cart_id, cart_status,create_ts,activitylist) VALUES (?,?,?,?,?)");
@@ -110,8 +110,10 @@ public class CartCassandraActor extends AbstractActor {
             cartResponse.setCart_status(cartDetails.getString("cart_status"));
             cartResponse.setCreate_ts(cartDetails.getTimestamp("create_ts"));
             cartResponse.setModify_ts(cartDetails.getTimestamp("modify_ts"));
-            Map<String, Map<String, ItemInfo>> activityMap = (Map<String, Map<String, ItemInfo>>) cartDetails.getObject("activitylist");
-            cartResponse.setActivitylist(activityMap);
+            if (null != cartDetails) {
+                Map<String, Map<String, ItemInfo>> activityMap = (Map<String, Map<String, ItemInfo>>) cartDetails.getObject("activitylist");
+                cartResponse.setActivitylist(activityMap);
+            }
 
         log.info("before result set fetch");
         getSender().tell(cartResponse,ActorRef.noSender());

@@ -2,14 +2,17 @@ package actors.supervisor;
 
 
 import actors.service.cassandra.CartCassandraActor;
-import akka.actor.AbstractActor;
-import akka.actor.ActorRef;
-import akka.actor.Props;
+import akka.actor.*;
+import akka.japi.pf.DeciderBuilder;
 import akka.routing.FromConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sun.media.sound.InvalidDataException;
+
+import java.lang.IllegalArgumentException;
+
 import com.typesafe.config.Config;
+import exception.NoDataAvailableException;
 import messages.CreateCartRequest;
+import scala.concurrent.duration.Duration;
 import util.GeneralService;
 
 public class CreateCartActor extends AbstractActor {
@@ -26,13 +29,20 @@ public class CreateCartActor extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(CreateCartRequest.class, message -> cartCassandraActor.tell(message, getSender()))
-                .match(InvalidDataException.class, message -> GeneralService.sendErrorJson(message))
-                .match(JsonProcessingException.class, message-> GeneralService.sendErrorJson(message))
-                .match(Exception.class, message -> GeneralService.sendErrorJson(message))
+                .match(IllegalArgumentException.class, message -> getSender().tell(GeneralService.sendErrorJson(message), getSelf()))
+                .match(JsonProcessingException.class, message -> getSender().tell(GeneralService.sendErrorJson(message), getSelf()))
+                .match(Exception.class, message -> getSender().tell(GeneralService.sendErrorJson(message), getSelf()))
                 .build();
     }
 
     public static Props props(Config config) {
         return Props.create(CreateCartActor.class, () -> new CreateCartActor(config));
     }
+
+    private static SupervisorStrategy strategy =
+            new OneForOneStrategy(10, Duration.create("1 minute"), DeciderBuilder.
+                    match(NoDataAvailableException.class, e -> SupervisorStrategy.resume()).
+                    match(NullPointerException.class, n -> SupervisorStrategy.restart()).
+                    match(IllegalArgumentException.class, i -> SupervisorStrategy.stop()).
+                    matchAny(o -> SupervisorStrategy.stop()).build());
 }
