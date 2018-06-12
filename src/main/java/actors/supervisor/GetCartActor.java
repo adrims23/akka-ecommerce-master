@@ -40,7 +40,7 @@ public class GetCartActor extends AbstractActor {
                     cartCassandraActor.tell(message, getSender());
                 })
 
-                .match(NoDataAvailableException.class, message -> getSender().tell(GeneralService.sendErrorJson(message),getSelf()))
+                .match(IllegalArgumentException.class, message -> getSender().tell(GeneralService.sendErrorJson(message),getSelf()))
                 .match(JsonProcessingException.class, message -> getSender().tell(GeneralService.sendErrorJson(message),getSelf()))
                 .match(Exception.class, message -> getSender().tell(GeneralService.sendErrorJson(message),getSelf())).build();
 
