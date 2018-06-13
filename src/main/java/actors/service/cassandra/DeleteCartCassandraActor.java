@@ -7,9 +7,9 @@ import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.datastax.driver.core.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
+import exception.NoDataAvailableException;
 import messages.DeleteCartRequest;
 
 import java.util.List;
@@ -37,13 +37,21 @@ public class DeleteCartCassandraActor extends AbstractActor {
         }).build();
     }
 
-    private void deleteCart(String accountId, UUID cartId) throws JsonProcessingException {
+    private void deleteCart(String accountId, UUID cartId) throws NoDataAvailableException {
         final Session session = SessionManager.getSession();
         log.info("inside deleteCart");
-        PreparedStatement statement = session.prepare("DELETE FROM shoppingcart WHERE account_key = ? and  cart_id = ?");
-        BoundStatement boundStatement = statement.bind(accountId, cartId);
+        PreparedStatement statement = session.prepare("SELECT * FROM SHOPPINGCART where account_key=? and cart_id=?");
+        BoundStatement boundStatement = statement.bind(accountId,cartId);
         ResultSet result = session.execute(boundStatement);
-        Object message=null;
+        String message=null;
+        if(result.isExhausted()){
+            //getSender().tell("There are no Plans available right now ", ActorRef.noSender());
+            throw new NoDataAvailableException("There are no cart to delete for this account : " + accountId);
+        } else {
+            PreparedStatement delStatement = session.prepare("DELETE FROM shoppingcart WHERE account_key = ? and  cart_id = ?");
+            BoundStatement delBoundStatement = delStatement.bind(accountId, cartId);
+            ResultSet delResult = session.execute(delBoundStatement);
+        }
 
         log.info("before result set fetch");
 
