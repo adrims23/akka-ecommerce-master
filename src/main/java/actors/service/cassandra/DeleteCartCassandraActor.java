@@ -47,16 +47,16 @@ public class DeleteCartCassandraActor extends AbstractActor {
 
         log.info("before result set fetch");
 
-        List<Row> deletionResult=result.all();
+//        List<Row> deletionResult=result.all();
+
+
 
 
         ObjectMapper mapper = new ObjectMapper();
         String jsonInString=null;
-        try {
-            jsonInString=mapper.writeValueAsString(deletionResult);
-        } catch (JsonProcessingException e) {
-           throw e;
-        }
+//        if(deletionResult.size()>0)
+            jsonInString="deleted successfully";
+
 
         getSender().tell(jsonInString,ActorRef.noSender());
 
