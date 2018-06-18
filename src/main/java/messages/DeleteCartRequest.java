@@ -4,9 +4,9 @@ import java.util.UUID;
 
 public class DeleteCartRequest {
 
-    private UUID cartId;
+    private final UUID cartId;
 
-    private String accountId;
+    private final String accountId;
 
     public DeleteCartRequest(UUID cartId, String accountId) {
         this.cartId = cartId;
@@ -17,16 +17,10 @@ public class DeleteCartRequest {
         return cartId;
     }
 
-    public void setCartId(UUID cartId) {
-        this.cartId = cartId;
-    }
 
     public String getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
 
 }

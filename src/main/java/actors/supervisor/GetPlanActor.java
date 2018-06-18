@@ -36,15 +36,7 @@ public class GetPlanActor extends AbstractActor {
                 .match(GetPlanRequest.class, message -> {
                     cassandraPlanReaderActor.tell(message, getSender());
                 })
-                .match(NoDataAvailableException.class, e -> {
-                    getSender().tell(GeneralService.sendErrorJson(e), getSelf());
-                })
-                .match(JsonProcessingException.class, e -> {
-                    getSender().tell(GeneralService.sendErrorJson(e), getSelf());
-                })
-                .matchAny(s -> {
-                    getSender().tell("requestNotExpected", ActorRef.noSender());
-                })
+
                 .build();
 
     }

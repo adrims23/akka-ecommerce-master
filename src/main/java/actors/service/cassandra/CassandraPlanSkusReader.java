@@ -40,7 +40,7 @@ public class CassandraPlanSkusReader extends AbstractActor {
         }).build();
     }
 
-    private void getPlanSkus() throws NoDataAvailableException, JsonProcessingException {
+    private void getPlanSkus() {
         // product_id | sku_id | prod_desc  | prod_enddate | prod_externalid | prod_frenchname
         // | prod_name | prod_startdate | sku_features| sku_order
 
@@ -71,13 +71,13 @@ public class CassandraPlanSkusReader extends AbstractActor {
             try {
                 jsonInString = mapper.writeValueAsString(planList);
             } catch (JsonProcessingException e) {
-               throw e;
+                log.info("error in forming json ");
             }
 
             getSender().tell(jsonInString, ActorRef.noSender());
         } else {
             log.info("No Planskus found");
-            throw new NoDataAvailableException("There are no Plans available right now");
+//            throw new NoDataAvailableException("There are no Plans available right now");
         }
 
     }

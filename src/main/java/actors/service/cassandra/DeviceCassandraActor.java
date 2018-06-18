@@ -55,7 +55,7 @@ public class DeviceCassandraActor extends AbstractActor {
 
     }
 
-    private void getDeviceList() throws NoDataAvailableException, JsonProcessingException {
+    private void getDeviceList() {
         final Session session = SessionManager.getSession();
         log.info("inside getDeviceList");
         PreparedStatement statement = session.prepare("SELECT * FROM DEVICESKU");
@@ -66,21 +66,21 @@ public class DeviceCassandraActor extends AbstractActor {
         log.info("before result set fetch");
         if (result == null) {
             //getSender().tell("There are no Plans available right now ", ActorRef.noSender());
-            throw new NoDataAvailableException("There are no Devices available right now");
+//            throw new NoDataAvailableException("There are no Devices available right now");
+            log.info("There are no Devices available right now");
         }
         List<Row> devices = result.all();
         List<FetchDeviceResponse> deviceList = new ArrayList<>();
-        FetchDeviceResponse fetchDevice = new FetchDeviceResponse();
-        devices.forEach(device -> {
-            fetchDevice.setProduct_id(device.getString("product_id"));
-            fetchDevice.setSku_id(device.getString("sku_id"));
-//            fetchDevice.setSku_order(device.getString("sku_order"));
-            fetchDevice.setProd_name(device.getString("prod_name"));
-            fetchDevice.setProd_frenchName(device.getString("prod_frenchname"));
-            fetchDevice.setProd_desc(device.getString("prod_desc"));
-            fetchDevice.setProd_externalId(device.getString("prod_externalId"));
 
-            log.info(fetchDevice.getProd_desc());
+        devices.forEach(device -> {
+            FetchDeviceResponse fetchDevice = new FetchDeviceResponse(device.getString("product_id"),
+                    device.getString("sku_id"),
+                    device.getString("sku_order"),
+                    device.getString("prod_name"),
+                    device.getString("prod_frenchname"),
+                    device.getString("prod_desc"),
+                    device.getString("prod_externalId")
+            );
             deviceList.add(fetchDevice);
 
 
@@ -91,7 +91,7 @@ public class DeviceCassandraActor extends AbstractActor {
         try {
             jsonInString = mapper.writeValueAsString(deviceList);
         } catch (JsonProcessingException e) {
-           throw e;
+           log.info("json issue");
         }
 
         getSender().tell(jsonInString, ActorRef.noSender());

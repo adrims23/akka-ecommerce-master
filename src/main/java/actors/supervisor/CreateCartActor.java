@@ -29,9 +29,6 @@ public class CreateCartActor extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(CreateCartRequest.class, message -> cartCassandraActor.tell(message, getSender()))
-                .match(IllegalArgumentException.class, message -> getSender().tell(GeneralService.sendErrorJson(message), getSelf()))
-                .match(JsonProcessingException.class, message -> getSender().tell(GeneralService.sendErrorJson(message), getSelf()))
-                .match(Exception.class, message -> getSender().tell(GeneralService.sendErrorJson(message), getSelf()))
                 .build();
     }
 

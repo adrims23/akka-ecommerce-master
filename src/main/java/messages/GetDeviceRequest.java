@@ -1,6 +1,9 @@
 package messages;
 
 public class GetDeviceRequest {
-    private String device;
+//    private final String device;
 
+    public GetDeviceRequest() {
+
+    }
 }

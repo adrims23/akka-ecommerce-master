@@ -37,7 +37,7 @@ public class DeleteCartCassandraActor extends AbstractActor {
         }).build();
     }
 
-    private void deleteCart(String accountId, UUID cartId) throws NoDataAvailableException {
+    private void deleteCart(String accountId, UUID cartId) {
         final Session session = SessionManager.getSession();
         log.info("inside deleteCart");
         PreparedStatement statement = session.prepare("SELECT * FROM SHOPPINGCART where account_key=? and cart_id=?");
@@ -46,7 +46,8 @@ public class DeleteCartCassandraActor extends AbstractActor {
         String message=null;
         if(result.isExhausted()){
             //getSender().tell("There are no Plans available right now ", ActorRef.noSender());
-            throw new NoDataAvailableException("There are no cart to delete for this account : " + accountId);
+//            throw new NoDataAvailableException("There are no cart to delete for this account : " + accountId);
+            log.info("There are no cart for this account : "+accountId);
         } else {
             PreparedStatement delStatement = session.prepare("DELETE FROM shoppingcart WHERE account_key = ? and  cart_id = ?");
             BoundStatement delBoundStatement = delStatement.bind(accountId, cartId);

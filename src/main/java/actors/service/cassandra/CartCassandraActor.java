@@ -50,13 +50,11 @@ public class CartCassandraActor extends AbstractActor {
         }).build();
     }
 
-    private void createAndPersisitCart(CreateCartRequest cartRequest) throws Exception {
+    private void createAndPersisitCart(CreateCartRequest cartRequest)  {
         try {
 
             final Session session = SessionManager.getSession();
-            if(!validate(cartRequest)){
-                throw new IllegalArgumentException("Mandatory fields Missing");
-            }
+
 
             PreparedStatement statement = session.prepare("INSERT INTO ecommerce.shoppingcart (account_key, cart_id, cart_status,create_ts,activitylist) VALUES (?,?,?,?,?)");
 
@@ -73,64 +71,55 @@ public class CartCassandraActor extends AbstractActor {
             if (result != null) {
 
                 getSender().tell("success", ActorRef.noSender());
-            } else {
-                getSender().tell("Some problem while creating cart ", ActorRef.noSender());
-                //throw new NoDataAvailableException("There are no Plans available right now");
             }
         } catch (Exception e) {
-            getSender().tell("Some problem while creating cart ", ActorRef.noSender());
-            throw new Exception(e);
+//            getSender().tell("Some problem while creating cart ", ActorRef.noSender());
+            log.info("Some problem ");
+
         }
     }
 
-    private Boolean validate(CreateCartRequest cartRequest) {
-        if(cartRequest.getAccountKey()==null || cartRequest.getActivityMap()==null){
-            return false;
-        }
-        return true;
-    }
 
-    private void getCartDetails(GetCartRequest msg) throws NoDataAvailableException {
+    private void getCartDetails(GetCartRequest msg)  {
         final Session session = SessionManager.getSession();
         log.info("inside getDeviceList");
         PreparedStatement statement = session.prepare("SELECT * FROM SHOPPINGCART where account_key=? and cart_id=?");
         BoundStatement boundStatement = statement.bind(msg.getAccount_id(),msg.getCart_id());
         ResultSet result = session.execute(boundStatement);
-        String message=null;
+//        String message=null;
         if(result==null){
             //getSender().tell("There are no Plans available right now ", ActorRef.noSender());
-            throw new NoDataAvailableException("There are no cart for this account : "+msg.getAccount_id());
+//            throw new NoDataAvailableException("There are no cart for this account : "+msg.getAccount_id());
+            log.info("There are no cart for this account : "+msg.getAccount_id());
         }
 //        GetCartResponse cartResponse=new GetCartResponse();
         Row cartDetails=result.one();
 
-            GetCartResponse cartResponse=new GetCartResponse();
-            cartResponse.setAccount_key(cartDetails.getString("account_key"));
-            cartResponse.setCart_id(cartDetails.getUUID("cart_id"));
-            cartResponse.setCart_status(cartDetails.getString("cart_status"));
-            cartResponse.setCreate_ts(cartDetails.getTimestamp("create_ts"));
-            cartResponse.setModify_ts(cartDetails.getTimestamp("modify_ts"));
-            if (null != cartDetails) {
-                Map<String, Map<String, ItemInfo>> activityMap = (Map<String, Map<String, ItemInfo>>) cartDetails.getObject("activitylist");
-                cartResponse.setActivitylist(activityMap);
-            }
+            GetCartResponse cartResponse=new GetCartResponse(cartDetails.getString("account_key"),
+                    cartDetails.getUUID("cart_id"),
+                    cartDetails.getString("cart_status"),
+                    cartDetails.getTimestamp("create_ts"),
+                    cartDetails.getTimestamp("modify_ts"),
+                    (Map<String, Map<String, ItemInfo>>) cartDetails.getObject("activitylist"));
+
 
         log.info("before result set fetch");
         getSender().tell(cartResponse,ActorRef.noSender());
 
     }
 
-    private void getCartListDetails(GetCartListRequest msg) throws NoDataAvailableException {
+    private void getCartListDetails(GetCartListRequest msg)  {
         final Session session = SessionManager.getSession();
         log.info("inside getDeviceList");
         PreparedStatement statement = session.prepare("SELECT * FROM SHOPPINGCART where account_key=?");
         BoundStatement boundStatement = statement.bind(msg.getAccount_id());
         ResultSet result = session.execute(boundStatement);
-        String message=null;
+//        String message=null;
 
         if(result==null){
             //getSender().tell("There are no Plans available right now ", ActorRef.noSender());
-            throw new NoDataAvailableException("There are no cart for this account : "+msg.getAccount_id());
+//            throw new NoDataAvailableException("There are no cart for this account : "+msg.getAccount_id());
+            log.info("There are no cart for this account : "+msg.getAccount_id());
         }
 
 //        GetCartResponse cartResponse=new GetCartResponse();
@@ -138,15 +127,14 @@ public class CartCassandraActor extends AbstractActor {
         List<GetCartResponse> cartList=new ArrayList<>();
 //        FetchDeviceResponse fetchDevice=new FetchDeviceResponse();
         cartDetails.forEach(cart -> {
-            GetCartResponse cartResponse=new GetCartResponse();
-            cartResponse.setAccount_key(cart.getString("account_key"));
-            cartResponse.setCart_id(cart.getUUID("cart_id"));
-            cartResponse.setCart_status(cart.getString("cart_status"));
-            cartResponse.setCreate_ts(cart.getTimestamp("create_ts"));
-            cartResponse.setModify_ts(cart.getTimestamp("modify_ts"));
-          Map<String, Map<String, ItemInfo>> activityMap = (Map<String, Map<String, ItemInfo>>) cart.getObject("activitylist");
-          cartResponse.setActivitylist(activityMap);
-          cartList.add(cartResponse);
+            GetCartResponse cartResponse=new GetCartResponse(cart.getString("account_key"),
+                    cart.getUUID("cart_id"),
+                    cart.getString("cart_status"),
+                    cart.getTimestamp("create_ts"),
+                    cart.getTimestamp("modify_ts"),
+                    (Map<String, Map<String, ItemInfo>>) cart.getObject("activitylist"));
+
+            cartList.add(cartResponse);
 
 
 

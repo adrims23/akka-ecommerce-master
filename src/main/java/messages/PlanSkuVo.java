@@ -5,13 +5,13 @@ import java.util.Map;
 public class PlanSkuVo {
     // product_id | sku_id | prod_desc  | prod_enddate | prod_externalid | prod_frenchname
     // | prod_name | prod_startdate | sku_features| sku_order
-    private String productId;
-    private String skuId;
-    private String productDesc;
-    private String productFrenchName;
-    private String productName;
-    private Map<String,String> features;
-    private int skuOrder;
+    private final String productId;
+    private final String skuId;
+    private final String productDesc;
+    private final String productFrenchName;
+    private final String productName;
+    private final Map<String,String> features;
+    private final int skuOrder;
 
     public PlanSkuVo(String productId, String skuId, String productDesc, String productFrenchName, String productName, Map<String, String> features, int skuOrder) {
         this.productId = productId;
