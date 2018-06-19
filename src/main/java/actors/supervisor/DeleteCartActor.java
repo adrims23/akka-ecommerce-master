@@ -16,6 +16,7 @@ public class DeleteCartActor extends AbstractActor {
     private final Config config;
 
     public DeleteCartActor(Config config) {
+        super();
         this.config = config;
         this.deleteCartCassandraActor = getContext().actorOf(FromConfig.getInstance().
                 props(DeleteCartCassandraActor.props(config)), "deleteCartCassandraActor");

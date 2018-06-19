@@ -27,6 +27,7 @@ public class CartCassandraActor extends AbstractActor {
     /* default */  final LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
 
     public CartCassandraActor(Config config) {
+        super();
         this.config = config;
     }
 

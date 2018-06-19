@@ -24,6 +24,7 @@ public class DeviceCassandraActor extends AbstractActor {
     final /*default*/ LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
 
     public DeviceCassandraActor(Config config) {
+        super();
         this.config = config;
     }
 

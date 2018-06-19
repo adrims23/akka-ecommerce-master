@@ -25,6 +25,7 @@ public class DeleteCartCassandraActor extends AbstractActor {
 
 
     public DeleteCartCassandraActor(final Config appConfig) {
+        super();
         this.appConfig = appConfig;
     }
 

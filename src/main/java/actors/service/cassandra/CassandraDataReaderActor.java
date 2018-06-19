@@ -9,6 +9,7 @@ public class CassandraDataReaderActor extends AbstractActor {
     private final Config appConfig;
 
     public CassandraDataReaderActor(Config appConfig) {
+        super();
         this.appConfig = appConfig;
     }
 

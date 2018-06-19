@@ -27,6 +27,7 @@ public class CassandraPlanSkusReader extends AbstractActor {
     /* default */ final  LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
 
     public CassandraPlanSkusReader(Config appConfig) {
+        super();
         this.appConfig = appConfig;
     }
 
@@ -51,7 +52,11 @@ public class CassandraPlanSkusReader extends AbstractActor {
         BoundStatement boundStatement = statement.bind();
         ResultSet result = session.execute(boundStatement);
 
-        if (result != null) {
+        if (result == null){
+            log.info("No Planskus found");
+//            throw new NoDataAvailableException("There are no Plans available right now");
+        }
+        else {
             log.info("Populating results for getPlanSkus");
             result.forEach(row -> {
                 PlanSkuVo planSkuVo = new PlanSkuVo(row.getString("product_id"),
@@ -73,9 +78,6 @@ public class CassandraPlanSkusReader extends AbstractActor {
             }
 
             getSender().tell(jsonInString, ActorRef.noSender());
-        } else {
-            log.info("No Planskus found");
-//            throw new NoDataAvailableException("There are no Plans available right now");
         }
 
     }

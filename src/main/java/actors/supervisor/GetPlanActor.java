@@ -14,6 +14,7 @@ public class GetPlanActor extends AbstractActor {
     private final Config config;
 
     public GetPlanActor(Config config) {
+        super();
         this.config = config;
         this.cassandraPlanReaderActor = getContext().actorOf(FromConfig.getInstance().
                 props(CassandraPlanSkusReader.props(config)), "cassandraPlanReaderActor");

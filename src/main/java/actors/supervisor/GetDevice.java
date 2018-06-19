@@ -26,6 +26,7 @@ public class GetDevice extends AbstractActor {
 
 
     public GetDevice(Config config) {
+        super();
         this.config = config;
         this.deviceCassandraActor = getContext().actorOf(FromConfig.getInstance().props(DeviceCassandraActor.props(config)), "deviceCassandraActor");
     }

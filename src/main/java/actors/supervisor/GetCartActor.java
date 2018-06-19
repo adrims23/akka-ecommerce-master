@@ -17,6 +17,7 @@ public class GetCartActor extends AbstractActor {
     private final Config config;
 
     public GetCartActor(Config config) {
+        super();
         this.config = config;
         this.cartCassandraActor = getContext().actorOf(FromConfig.getInstance().
                 props(CartCassandraActor.props(config)), "cartCassandraActor");
