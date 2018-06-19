@@ -86,10 +86,8 @@ public class CartCassandraActor extends AbstractActor {
         BoundStatement boundStatement = statement.bind(msg.getAccount_id(),msg.getCart_id());
         ResultSet result = session.execute(boundStatement);
 //        String message=null;
-        if(result==null){
-            if(log.isInfoEnabled()) {
-                log.info("There are no cart for this account : " + msg.getAccount_id());
-            }
+        if(result==null && log.isInfoEnabled()){
+            log.info("There are no cart for this account : " + msg.getAccount_id());
         }
         Row cartDetails=result.one();
 
@@ -114,10 +112,8 @@ public class CartCassandraActor extends AbstractActor {
         ResultSet result = session.execute(boundStatement);
 //        String message=null;
 
-        if(result==null){
-            if(log.isInfoEnabled()) {
-                log.info("There are no cart for this account : " + msg.getAccount_id());
-            }
+        if(result==null && log.isInfoEnabled()){
+            log.info("There are no cart for this account : " + msg.getAccount_id());
         }
 
         List<Row> cartDetails=result.all();
