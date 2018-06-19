@@ -16,13 +16,21 @@ public class DeleteCartCassandraActor extends AbstractActor {
 
     private final Config appConfig;
 
-    public DeleteCartCassandraActor(Config appConfig) {
-        this.appConfig = appConfig;
-    }
+   
     ActorSystem system = context().system();
+
+    
     final LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
 
-    public static Props props(Config config) {
+
+
+    public DeleteCartCassandraActor(final Config appConfig) {
+        this.appConfig = appConfig;
+    }
+
+
+
+    public static Props props(final Config config) {
         return Props.create(DeleteCartCassandraActor.class,
                 () -> new DeleteCartCassandraActor(config));
     }
@@ -34,17 +42,17 @@ public class DeleteCartCassandraActor extends AbstractActor {
         }).build();
     }
 
-    private void deleteCart(String accountId, UUID cartId) {
+    private void deleteCart(final String accountId, final UUID cartId) {
         final Session session = SessionManager.getSession();
         log.info("inside deleteCart");
-        PreparedStatement statement = session.prepare("SELECT * FROM SHOPPINGCART where account_key=? and cart_id=?");
-        BoundStatement boundStatement = statement.bind(accountId,cartId);
-        ResultSet result = session.execute(boundStatement);
+        final PreparedStatement statement = session.prepare("SELECT * FROM SHOPPINGCART where account_key=? and cart_id=?");
+        final BoundStatement boundStatement = statement.bind(accountId,cartId);
+        final ResultSet result = session.execute(boundStatement);
         if(result.isExhausted()){
             log.info("There are no cart for this account : "+accountId);
         } else {
-            PreparedStatement delStatement = session.prepare("DELETE FROM shoppingcart WHERE account_key = ? and  cart_id = ?");
-            BoundStatement delBoundStatement = delStatement.bind(accountId, cartId);
+            final PreparedStatement delStatement = session.prepare("DELETE FROM shoppingcart WHERE account_key = ? and  cart_id = ?");
+            final BoundStatement delBoundStatement = delStatement.bind(accountId, cartId);
             session.execute(delBoundStatement);
         }
 
