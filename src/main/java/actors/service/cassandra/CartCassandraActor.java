@@ -87,7 +87,9 @@ public class CartCassandraActor extends AbstractActor {
         ResultSet result = session.execute(boundStatement);
 //        String message=null;
         if(result==null){
-            log.info("There are no cart for this account : "+msg.getAccount_id());
+            if(log.isInfoEnabled()) {
+                log.info("There are no cart for this account : " + msg.getAccount_id());
+            }
         }
         Row cartDetails=result.one();
 
