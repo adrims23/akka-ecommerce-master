@@ -4,16 +4,10 @@ import actors.service.cassandra.CassandraPlanSkusReader;
 import akka.actor.*;
 import akka.japi.pf.DeciderBuilder;
 import akka.routing.FromConfig;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.typesafe.config.Config;
 import exception.NoDataAvailableException;
-import jdk.nashorn.internal.parser.JSONParser;
 import messages.GetPlanRequest;
 import scala.concurrent.duration.Duration;
-
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class GetPlanActor extends AbstractActor {
     private final ActorRef cassandraPlanReaderActor;

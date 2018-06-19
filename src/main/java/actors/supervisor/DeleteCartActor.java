@@ -1,14 +1,11 @@
 package actors.supervisor;
 
-import actors.service.cassandra.CassandraDataReaderActor;
 import actors.service.cassandra.DeleteCartCassandraActor;
 import akka.actor.*;
 import akka.japi.pf.DeciderBuilder;
 import akka.routing.FromConfig;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.typesafe.config.Config;
 import messages.DeleteCartRequest;
-import messages.GetCartRequest;
 import scala.concurrent.duration.Duration;
 
 

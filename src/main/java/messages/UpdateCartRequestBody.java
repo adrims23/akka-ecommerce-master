@@ -3,7 +3,6 @@ package messages;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
-import java.util.UUID;
 
 public class UpdateCartRequestBody {
 

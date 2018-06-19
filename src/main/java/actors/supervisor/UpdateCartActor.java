@@ -1,13 +1,11 @@
 package actors.supervisor;
 
 import actors.service.cassandra.CartCassandraActor;
-import actors.service.cassandra.DeviceCassandraActor;
 import akka.actor.*;
 import akka.japi.pf.DeciderBuilder;
 import akka.routing.FromConfig;
 import com.typesafe.config.Config;
 import messages.UpdateCartRequest;
-import messages.UpdateCartRequestBody;
 import scala.concurrent.duration.Duration;
 
 import java.io.IOException;

@@ -15,7 +15,6 @@ import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import com.typesafe.config.Config;
 import constants.RogersConstants;
-import exception.NoDataAvailableException;
 import messages.*;
 
 import java.util.UUID;
@@ -28,7 +27,6 @@ public class RoutesActor extends AbstractActor {
 
     private final Config appConfig;
     private final ActorRef getCartSupervisorActor;
-//    private final ActorRef deviceCassandraActor;
     private final ActorRef deleteCartSupervisorActor;
     private final ActorRef updateCartSupervisorActor;
     private final ActorRef createCartSupervisorActor;
@@ -49,7 +47,6 @@ public class RoutesActor extends AbstractActor {
         this.createCartSupervisorActor = system.actorOf(CreateCartActor.props(appConfig), "CreateCartActor");
 
 
-//        this.deviceCassandraActor=system.actorOf(DeviceCassandraActor.props(),"DeviceCassandraActor");
         this.getDeviceActor = system.actorOf(GetDevice.props(appConfig),"GetDeviceActor");
         // Set up and start the HTTP server
         final Http http = Http.get(system);

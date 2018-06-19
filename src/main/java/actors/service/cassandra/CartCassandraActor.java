@@ -9,9 +9,7 @@ import akka.event.LoggingAdapter;
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.utils.UUIDs;
 import com.google.common.reflect.TypeToken;
-import java.lang.IllegalArgumentException;
 import com.typesafe.config.Config;
-import exception.NoDataAvailableException;
 import messages.*;
 
 import java.util.ArrayList;

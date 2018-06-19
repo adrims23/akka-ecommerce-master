@@ -14,7 +14,6 @@ import com.datastax.driver.core.Session;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-import exception.NoDataAvailableException;
 import messages.GetPlanRequest;
 
 import java.util.ArrayList;

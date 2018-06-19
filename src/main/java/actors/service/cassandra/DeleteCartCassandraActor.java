@@ -7,12 +7,9 @@ import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.datastax.driver.core.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-import exception.NoDataAvailableException;
 import messages.DeleteCartRequest;
 
-import java.util.List;
 import java.util.UUID;
 
 public class DeleteCartCassandraActor extends AbstractActor {

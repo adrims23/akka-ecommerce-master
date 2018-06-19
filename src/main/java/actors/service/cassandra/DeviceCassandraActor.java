@@ -10,7 +10,6 @@ import com.datastax.driver.core.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-import exception.NoDataAvailableException;
 import messages.FetchDeviceResponse;
 import messages.GetDeviceRequest;
 import messages.PostDeviceRequest;
