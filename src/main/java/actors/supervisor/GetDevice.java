@@ -9,7 +9,7 @@ import exception.NoDataAvailableException;
 import messages.GetDeviceRequest;
 import messages.PostDeviceRequest;
 import scala.concurrent.duration.Duration;
-import util.GeneralService;
+
 
 public class GetDevice extends AbstractActor {
 
@@ -36,10 +36,7 @@ public class GetDevice extends AbstractActor {
             deviceCassandraActor.tell(msg, getSender());
         }).match(PostDeviceRequest.class, msg -> {
             deviceCassandraActor.tell(msg, getSender());
-        }).match(NoDataAvailableException.class, e -> {
-            getSender().tell(GeneralService.sendErrorJson(e),getSelf());
-        })
-                .build();
+        }) .build();
     }
 
     private static SupervisorStrategy strategy =
