@@ -88,11 +88,8 @@ public class CartCassandraActor extends AbstractActor {
         ResultSet result = session.execute(boundStatement);
 //        String message=null;
         if(result==null){
-            //getSender().tell("There are no Plans available right now ", ActorRef.noSender());
-//            throw new NoDataAvailableException("There are no cart for this account : "+msg.getAccount_id());
             log.info("There are no cart for this account : "+msg.getAccount_id());
         }
-//        GetCartResponse cartResponse=new GetCartResponse();
         Row cartDetails=result.one();
 
             GetCartResponse cartResponse=new GetCartResponse(cartDetails.getString("account_key"),
@@ -117,15 +114,11 @@ public class CartCassandraActor extends AbstractActor {
 //        String message=null;
 
         if(result==null){
-            //getSender().tell("There are no Plans available right now ", ActorRef.noSender());
-//            throw new NoDataAvailableException("There are no cart for this account : "+msg.getAccount_id());
             log.info("There are no cart for this account : "+msg.getAccount_id());
         }
 
-//        GetCartResponse cartResponse=new GetCartResponse();
         List<Row> cartDetails=result.all();
         List<GetCartResponse> cartList=new ArrayList<>();
-//        FetchDeviceResponse fetchDevice=new FetchDeviceResponse();
         cartDetails.forEach(cart -> {
             GetCartResponse cartResponse=new GetCartResponse(cart.getString("account_key"),
                     cart.getUUID("cart_id"),
@@ -160,9 +153,7 @@ public class CartCassandraActor extends AbstractActor {
 
 
 
-//        BoundStatement boundStatement = statement.bind(message.getCartStatus(),message.getAccountId(),message.getCartId());
-        ResultSet resultSet = session.execute(boundStatement);
-        Object msg = null;
+        session.execute(boundStatement);
         log.info("cart with account id "+ message.getAccountId() + "has been updated");
         getSender().tell("cart Updated", ActorRef.noSender());
     }

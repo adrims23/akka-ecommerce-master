@@ -51,7 +51,6 @@ public class CassandraPlanSkusReader extends AbstractActor {
         PreparedStatement statement = session.prepare("SELECT * FROM PLANSKU");
         BoundStatement boundStatement = statement.bind();
         ResultSet result = session.execute(boundStatement);
-        //ResultSet result = session.execute(stmt.toString());
 
         if (result != null) {
             log.info("Populating results for getPlanSkus");
@@ -67,7 +66,7 @@ public class CassandraPlanSkusReader extends AbstractActor {
             });
 
             ObjectMapper mapper = new ObjectMapper();
-            String jsonInString = null;
+            String jsonInString ="";
             try {
                 jsonInString = mapper.writeValueAsString(planList);
             } catch (JsonProcessingException e) {

@@ -43,30 +43,16 @@ public class DeleteCartCassandraActor extends AbstractActor {
         PreparedStatement statement = session.prepare("SELECT * FROM SHOPPINGCART where account_key=? and cart_id=?");
         BoundStatement boundStatement = statement.bind(accountId,cartId);
         ResultSet result = session.execute(boundStatement);
-        String message=null;
         if(result.isExhausted()){
-            //getSender().tell("There are no Plans available right now ", ActorRef.noSender());
-//            throw new NoDataAvailableException("There are no cart to delete for this account : " + accountId);
             log.info("There are no cart for this account : "+accountId);
         } else {
             PreparedStatement delStatement = session.prepare("DELETE FROM shoppingcart WHERE account_key = ? and  cart_id = ?");
             BoundStatement delBoundStatement = delStatement.bind(accountId, cartId);
-            ResultSet delResult = session.execute(delBoundStatement);
+            session.execute(delBoundStatement);
         }
 
         log.info("before result set fetch");
-
-//        List<Row> deletionResult=result.all();
-
-
-
-
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonInString=null;
-//        if(deletionResult.size()>0)
-            jsonInString="deleted successfully";
-
-
+        String jsonInString="deleted successfully";
         getSender().tell(jsonInString,ActorRef.noSender());
 
     }

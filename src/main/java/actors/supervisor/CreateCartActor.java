@@ -5,7 +5,6 @@ import actors.service.cassandra.CartCassandraActor;
 import akka.actor.*;
 import akka.japi.pf.DeciderBuilder;
 import akka.routing.FromConfig;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.lang.IllegalArgumentException;
 
@@ -13,7 +12,6 @@ import com.typesafe.config.Config;
 import exception.NoDataAvailableException;
 import messages.CreateCartRequest;
 import scala.concurrent.duration.Duration;
-import util.GeneralService;
 
 public class CreateCartActor extends AbstractActor {
 

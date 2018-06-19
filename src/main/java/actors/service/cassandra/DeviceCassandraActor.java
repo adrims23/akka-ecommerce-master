@@ -46,8 +46,7 @@ public class DeviceCassandraActor extends AbstractActor {
         log.info("inside postDevice");
         PreparedStatement statement = session.prepare("INSERT INTO ecommerce.devicesku(product_id,sku_id,sku_order,prod_name,prod_frenchname,prod_desc,prod_externalid) values(?,?,?,?,?,?,?)");
         BoundStatement boundStatement = statement.bind(message.getProduct_id(), message.getSku_id(), message.getSku_order(), message.getProd_name(), message.getProd_frenchName(), message.getProd_desc(), message.getProd_externalId());
-        ResultSet result = session.execute(boundStatement);
-        Object msg = null;
+        session.execute(boundStatement);
         log.info("Device inserted");
 
         getSender().tell("device inserted", ActorRef.noSender());
@@ -62,7 +61,6 @@ public class DeviceCassandraActor extends AbstractActor {
         BoundStatement boundStatement = statement.bind();
         ResultSet result = session.execute(boundStatement);
         Object message = null;
-
         log.info("before result set fetch");
         if (result == null) {
             //getSender().tell("There are no Plans available right now ", ActorRef.noSender());
@@ -87,7 +85,7 @@ public class DeviceCassandraActor extends AbstractActor {
         });
 
         ObjectMapper mapper = new ObjectMapper();
-        String jsonInString = null;
+        String jsonInString = "";
         try {
             jsonInString = mapper.writeValueAsString(deviceList);
         } catch (JsonProcessingException e) {
