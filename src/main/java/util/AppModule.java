@@ -18,8 +18,8 @@ public class AppModule extends AbstractModule {
     }
 
     @Provides
-    @javax.inject.Singleton
-    @com.google.inject.name.Named(RogersConstants.ACTOR_SYSTEM)
+    @Singleton
+    @Named(RogersConstants.ACTOR_SYSTEM)
     @javax.inject.Inject
     public ActorSystem createActorSystem(@Named(SessionConstants.APP_CONFIG) Config config) {
         String actorSystemName = System.getProperty("ProfileService");

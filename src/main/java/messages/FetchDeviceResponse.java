@@ -2,57 +2,57 @@ package messages;
 
 public class FetchDeviceResponse {
 
-    private final String product_id;
-    private final String sku_id;
-    private final String sku_order;
-    private final String prod_name;
-    private final String prod_frenchName;
-    private final String prod_desc;
-    private final String prod_externalId;
+    private final String productId;
+    private final String skuId;
+    private final String skuOrder;
+    private final String prodName;
+    private final String prodFrenchName;
+    private final String prodDesc;
+    private final String prodExternalId;
 
 
 
-    public FetchDeviceResponse(String product_id, String sku_id, String sku_order, String prod_name, String prod_frenchName, String prod_desc, String prod_externalId) {
-        this.product_id = product_id;
-        this.sku_id = sku_id;
-        this.sku_order = sku_order;
-        this.prod_name = prod_name;
-        this.prod_frenchName = prod_frenchName;
-        this.prod_desc = prod_desc;
-        this.prod_externalId = prod_externalId;
+    public FetchDeviceResponse(String product_id, String sku_id, String sku_order, String prodName, String prodFrenchName, String prodDesc, String prodExternalId) {
+        this.productId = product_id;
+        this.skuId = sku_id;
+        this.skuOrder = sku_order;
+        this.prodName = prodName;
+        this.prodFrenchName = prodFrenchName;
+        this.prodDesc = prodDesc;
+        this.prodExternalId = prodExternalId;
     }
 
-    public String getProduct_id() {
-        return product_id;
+    public String getProductId() {
+        return productId;
     }
 
-    public String getSku_id() {
-        return sku_id;
-    }
-
-
-    public String getSku_order() {
-        return sku_order;
+    public String getSkuId() {
+        return skuId;
     }
 
 
-    public String getProd_name() {
-        return prod_name;
+    public String getSkuOrder() {
+        return skuOrder;
     }
 
 
-    public String getProd_frenchName() {
-        return prod_frenchName;
+    public String getProdName() {
+        return prodName;
     }
 
 
-    public String getProd_desc() {
-        return prod_desc;
+    public String getProdFrenchName() {
+        return prodFrenchName;
     }
 
 
-    public String getProd_externalId() {
-        return prod_externalId;
+    public String getProdDesc() {
+        return prodDesc;
+    }
+
+
+    public String getProdExternalId() {
+        return prodExternalId;
     }
 
 }
