@@ -113,7 +113,9 @@ public class CartCassandraActor extends AbstractActor {
 //        String message=null;
 
         if(result==null){
-            log.info("There are no cart for this account : "+msg.getAccount_id());
+            if(log.isInfoEnabled()) {
+                log.info("There are no cart for this account : " + msg.getAccount_id());
+            }
         }
 
         List<Row> cartDetails=result.all();
@@ -153,7 +155,9 @@ public class CartCassandraActor extends AbstractActor {
 
 
         session.execute(boundStatement);
-        log.info("cart with account id "+ message.getAccountId() + "has been updated");
+        if(log.isInfoEnabled()) {
+            log.info("cart with account id " + message.getAccountId() + "has been updated");
+        }
         getSender().tell("cart Updated", ActorRef.noSender());
     }
 }

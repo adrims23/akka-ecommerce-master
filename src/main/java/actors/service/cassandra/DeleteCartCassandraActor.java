@@ -50,14 +50,17 @@ public class DeleteCartCassandraActor extends AbstractActor {
         final BoundStatement boundStatement = statement.bind(accountId,cartId);
         final ResultSet result = session.execute(boundStatement);
         if(result.isExhausted()){
-            log.info("There are no cart for this account : "+accountId);
+            if(log.isInfoEnabled()) {
+                log.info("There are no cart for this account : " + accountId);
+            }
         } else {
             final PreparedStatement delStatement = session.prepare("DELETE FROM shoppingcart WHERE account_key = ? and  cart_id = ?");
             final BoundStatement delBoundStatement = delStatement.bind(accountId, cartId);
             session.execute(delBoundStatement);
         }
-
-        log.info("before result set fetch");
+        if(log.isInfoEnabled()) {
+            log.info("before result set fetch");
+        }
         String jsonInString="deleted successfully";
         getSender().tell(jsonInString,ActorRef.noSender());
 
