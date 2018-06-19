@@ -20,8 +20,8 @@ import java.util.List;
 public class DeviceCassandraActor extends AbstractActor {
 
     private final Config config;
-    ActorSystem system = context().system();
-    final LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
+    /*default*/ ActorSystem system = context().system();
+    final /*default*/ LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
 
     public DeviceCassandraActor(Config config) {
         this.config = config;

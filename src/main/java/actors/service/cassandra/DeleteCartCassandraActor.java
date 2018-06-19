@@ -16,11 +16,11 @@ public class DeleteCartCassandraActor extends AbstractActor {
 
     private final Config appConfig;
 
-   
-    ActorSystem system = context().system();
+
+    /*default*/ ActorSystem system = context().system();
 
     
-    final LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
+    final /*default*/ LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
 
 
 

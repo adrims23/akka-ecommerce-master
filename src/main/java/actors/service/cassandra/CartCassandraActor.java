@@ -19,12 +19,12 @@ import java.util.Map;
 public class CartCassandraActor extends AbstractActor {
 
     private final Config config;
-    ActorSystem system = context().system();
+    /* default */ ActorSystem system = context().system();
     public static final TypeToken<Map<String, Map<String, ItemInfo>>> TYPE_TOKEN = new TypeToken<Map<String, Map<String, ItemInfo>>>() {
 
     };
 
-    final LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
+    /* default */  final LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
 
     public CartCassandraActor(Config config) {
         this.config = config;

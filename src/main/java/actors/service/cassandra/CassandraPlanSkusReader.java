@@ -22,9 +22,9 @@ import java.util.List;
 
 public class CassandraPlanSkusReader extends AbstractActor {
     private final Config appConfig;
-    ActorSystem system = context().system();
-    SessionManager sessionManager = new SessionManager();
-    final LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
+    /* default */ ActorSystem system = context().system();
+    /* default */ SessionManager sessionManager = new SessionManager();
+    /* default */ final  LoggingAdapter log = Logging.getLogger(system.eventStream(), this);
 
     public CassandraPlanSkusReader(Config appConfig) {
         this.appConfig = appConfig;

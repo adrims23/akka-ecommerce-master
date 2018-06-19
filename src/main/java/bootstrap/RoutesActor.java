@@ -82,7 +82,7 @@ public class RoutesActor extends AbstractActor {
     }
 
     // In order to access all directives the code needs to be inside an instance of a class that extends AllDirectives
-    class Routes extends AllDirectives {
+    /*default*/ class Routes extends AllDirectives {
         public Route createRoute(ActorRef mainActor, String hostname, int port) {
             final String host = hostname + ":" + port;
             return route(
@@ -191,7 +191,7 @@ public class RoutesActor extends AbstractActor {
                             () -> {
                                 return path(planId -> {
                                     final CompletionStage<Object> consolidatedDetailF =
-                                            PatternsCS.ask(getPlanActor, new GetPlanRequest(planId.toString()),
+                                            PatternsCS.ask(getPlanActor, new GetPlanRequest(planId),
                                                     appConfig.getLong("actors.timeout"));
                                     return onSuccess(() -> consolidatedDetailF,
                                             planDetails -> this.complete(StatusCodes.OK, planDetails, Jackson.marshaller()));
